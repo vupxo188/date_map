@@ -47,3 +47,16 @@ data_q3 <- data.frame(
   Std_Dev = sd_values
 )
 data_q3
+
+#Question 4: Given a list of mixed date formats, use map() and possibly() from purrr to safely convert them to Date format and extract the month name.
+#This ensures that month names like "Aug" are correctly recognized in all systems.
+Sys.setlocale("LC_TIME", "C")
+
+date_strings <- list("2023-06-10", "2022/12/25", "15-Aug-2021", "InvalidDate")
+
+#Create a safe function to parse dates while handling errors
+safe_parse_date <- possibly(~ as.Date(.x, tryFormats = c("%Y-%m-%d", "%Y/%m/%d", "%d-%b-%Y")), NA)
+#Convert date strings into Date format safely.
+converted_dates <- map(date_strings, safe_parse_date)
+#Extract the month name from each valid date.
+map_chr(converted_dates, ~ if (!is.na(.x)) as.character(month(.x, label = TRUE, locale = "en_US")) else "Invalid")
